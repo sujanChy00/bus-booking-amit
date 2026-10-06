@@ -1,12 +1,13 @@
 import { Button } from "@bus-booking/ui/components/button";
 import { Input } from "@bus-booking/ui/components/input";
 import { Label } from "@bus-booking/ui/components/label";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import { useState } from "react";
 
 const searchSchema = z.object({
   email: z.string().optional().catch(""),
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/_auth/verify-email")({
 function VerifyEmailPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
+const [resending, setResending] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -50,11 +52,36 @@ function VerifyEmailPage() {
     },
   });
 
+  const handleResendOTP = async () => {
+    const email = form.state.values.email || search.email;
+    if (!email) {
+      toast.error("Please enter your email address.");
+      return;
+    }
+    setResending(true);
+    try {
+      await authClient.emailOtp.sendVerificationOtp({
+        email,
+        type: "email-verification",
+      });
+      toast.success("A new verification code has been sent to your email!");
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : "Failed to resend the code. Please try again.";
+      toast.error(errorMsg);
+    } finally {
+      setResending(false);
+    }
+  };
+
   return (
     <div className="mx-auto mt-12 w-full max-w-md p-6">
       <h1 className="mb-2 text-center text-3xl font-bold">Verify Email</h1>
       <p className="mb-6 text-center text-sm text-muted-foreground">
-        Enter the 6-digit OTP code sent to your email address to complete registration.
+        Enter the 6-digit OTP code sent to your email address to complete
+        registration.
       </p>
 
       <form
@@ -130,6 +157,16 @@ function VerifyEmailPage() {
             </Button>
           )}
         </form.Subscribe>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleResendOTP}
+          disabled={resending}
+        >
+          {resending ? "Resending..." : "Resend OTP Code"}
+        </Button>
 
         <div className="mt-4 text-center">
           <Button variant="link" onClick={() => navigate({ to: "/login" })}>

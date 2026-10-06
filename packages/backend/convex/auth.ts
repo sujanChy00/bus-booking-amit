@@ -94,8 +94,12 @@ function createAuth(ctx: GenericCtx<DataModel>) {
       enabled: true,
       requireEmailVerification: false,
     },
+    emailVerification: {
+      autoSignInAfterVerification: true,
+    },
     plugins: [
       emailOTP({
+        expiresIn: 600,
         async sendVerificationOTP({ email, otp, type }) {
           await sendOTPEmail(email, otp, type);
         },

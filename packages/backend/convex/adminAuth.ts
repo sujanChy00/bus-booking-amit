@@ -1,40 +1,38 @@
-import { mutation } from "./_generated/server";
+import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { createAuth } from "./auth";
 
-export const checkAdminAuthorized = mutation({
+function isAuthorizedAdminEmail(email: string): boolean {
+  const rawEmails = process.env.ADMIN_EMAILS || "suzu9869@gmail.com";
+  const allowedEmails = rawEmails
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return allowedEmails.includes(email.trim().toLowerCase());
+}
+
+export const sendRegistrationOTP = action({
   args: {
     email: v.string(),
-  },
-  handler: async (_ctx, args) => {
-    const rawEmails = process.env.ADMIN_EMAILS || "suzu9869@gmail.com";
-    const allowedEmails = rawEmails
-      .split(",")
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean);
-
-    const isAuthorized = allowedEmails.includes(args.email.trim().toLowerCase());
-    return { isAuthorized, email: args.email };
-  },
-});
-
-export const sendRegistrationOTP = mutation({
-  args: {
-    email: v.string(),
+    password: v.string(),
+    name: v.string(),
   },
   handler: async (ctx, args) => {
-    const rawEmails = process.env.ADMIN_EMAILS || "suzu9869@gmail.com";
-    const allowedEmails = rawEmails
-      .split(",")
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean);
-
     const email = args.email.trim().toLowerCase();
-    if (!allowedEmails.includes(email)) {
+    if (!isAuthorizedAdminEmail(email)) {
       throw new Error("This email is not authorized to register as an admin.");
     }
 
     const auth = createAuth(ctx);
+
+    await auth.api.signUpEmail({
+      body: {
+        email,
+        password: args.password,
+        name: args.name,
+      },
+    });
+
     await auth.api.sendVerificationOTP({
       body: {
         email,
@@ -46,7 +44,7 @@ export const sendRegistrationOTP = mutation({
   },
 });
 
-export const sendPasswordResetOTP = mutation({
+export const sendPasswordResetOTP = action({
   args: {
     email: v.string(),
   },

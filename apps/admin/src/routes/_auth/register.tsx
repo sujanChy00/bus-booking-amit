@@ -1,15 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import SignUpForm from "@/components/sign-up-form";
 
 export const Route = createFileRoute("/_auth/register")({
-  component: RegisterPage,
+  component: SignUpForm,
 });
-
-function RegisterPage() {
-  const navigate = useNavigate();
-
-  return (
-    <SignUpForm onSwitchToSignIn={() => navigate({ to: "/login" })} />
-  );
-}

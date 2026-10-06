@@ -2,19 +2,15 @@ import { api } from "@bus-booking/backend/convex/_generated/api";
 import { Button } from "@bus-booking/ui/components/button";
 import { Input } from "@bus-booking/ui/components/input";
 import { Label } from "@bus-booking/ui/components/label";
-import { useMutation } from "convex/react";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
+import { useAction } from "convex/react";
 import { toast } from "sonner";
 import z from "zod";
 
-export default function ForgotPasswordForm({
-  onSwitchToSignIn,
-}: {
-  onSwitchToSignIn: () => void;
-}) {
+export default function ForgotPasswordForm() {
   const navigate = useNavigate();
-  const sendPasswordResetOTP = useMutation(api.adminAuth.sendPasswordResetOTP);
+  const sendPasswordResetOTP = useAction(api.adminAuth.sendPasswordResetOTP);
 
   const form = useForm({
     defaultValues: {
@@ -100,7 +96,14 @@ export default function ForgotPasswordForm({
         </form.Subscribe>
 
         <div className="mt-4 text-center">
-          <Button variant="link" onClick={onSwitchToSignIn}>
+          <Button
+            variant="link"
+            onClick={() => {
+              navigate({
+                to: "/login",
+              });
+            }}
+          >
             Remember your password? Sign In
           </Button>
         </div>

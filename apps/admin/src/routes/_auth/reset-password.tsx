@@ -7,6 +7,14 @@ import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@bus-booking/ui/components/input-group";
+import { Eye, EyeClosed } from "lucide-react";
+import { useState } from "react";
 
 const searchSchema = z.object({
   email: z.string().optional().catch(""),
@@ -18,6 +26,8 @@ export const Route = createFileRoute("/_auth/reset-password")({
 });
 
 function ResetPasswordPage() {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [resending, setResending] = useState(false);
   const search = Route.useSearch();
   const navigate = useNavigate();
 
@@ -66,6 +76,30 @@ function ResetPasswordPage() {
         }),
     },
   });
+
+  const handleResendOTP = async () => {
+    const email = form.state.values.email || search.email;
+    if (!email) {
+      toast.error("Please enter your email address.");
+      return;
+    }
+    setResending(true);
+    try {
+      await authClient.emailOtp.sendVerificationOtp({
+        email,
+        type: "forget-password",
+      });
+      toast.success("A new reset code has been sent to your email!");
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : "Failed to resend the code. Please try again.";
+      toast.error(errorMsg);
+    } finally {
+      setResending(false);
+    }
+  };
 
   return (
     <div className="mx-auto mt-10 w-full max-w-md p-6">
@@ -136,14 +170,25 @@ function ResetPasswordPage() {
             {(field) => (
               <div className="space-y-2">
                 <Label htmlFor={field.name}>New Password</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
+                <InputGroup>
+                  <InputGroupAddon align={"inline-end"}>
+                    <InputGroupButton
+                      onClick={() => {
+                        setPasswordVisible((prev) => !prev);
+                      }}
+                    >
+                      {passwordVisible ? <Eye /> : <EyeClosed />}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id={field.name}
+                    name={field.name}
+                    type={passwordVisible ? "text" : "password"}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                </InputGroup>
                 {field.state.meta.errors.map((error) => (
                   <p key={error?.message} className="text-sm text-destructive">
                     {error?.message}
@@ -193,6 +238,16 @@ function ResetPasswordPage() {
             </Button>
           )}
         </form.Subscribe>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleResendOTP}
+          disabled={resending}
+        >
+          {resending ? "Resending..." : "Resend OTP Code"}
+        </Button>
 
         <div className="mt-4 text-center">
           <Button variant="link" onClick={() => navigate({ to: "/login" })}>

@@ -7,17 +7,18 @@ import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@bus-booking/ui/components/input-group";
+import { Eye, EyeClosed } from "lucide-react";
+import { useState } from "react";
 
-export default function SignInForm({
-  onSwitchToForgotPassword,
-  onSwitchToSignUp,
-}: {
-  onSwitchToForgotPassword?: () => void;
-  onSwitchToSignUp?: () => void;
-}) {
-  const navigate = useNavigate({
-    from: "/",
-  });
+export default function SignInForm() {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm({
     defaultValues: {
@@ -46,7 +47,7 @@ export default function SignInForm({
     },
     validators: {
       onSubmit: z.object({
-        email: z.string().email("Invalid email address"),
+        email: z.email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
       }),
     },
@@ -97,25 +98,37 @@ export default function SignInForm({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor={field.name}>Password</Label>
-                  {onSwitchToForgotPassword && (
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="h-auto p-0 text-xs"
-                      onClick={onSwitchToForgotPassword}
-                    >
-                      Forgot Password?
-                    </Button>
-                  )}
+
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="h-auto p-0 text-xs"
+                    onClick={() => {
+                      navigate({ to: "/forgot-password" });
+                    }}
+                  >
+                    Forgot Password?
+                  </Button>
                 </div>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
+                <InputGroup>
+                  <InputGroupAddon align={"inline-end"}>
+                    <InputGroupButton
+                      onClick={() => {
+                        setPasswordVisible((prev) => !prev);
+                      }}
+                    >
+                      {passwordVisible ? <Eye /> : <EyeClosed />}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id={field.name}
+                    name={field.name}
+                    type={passwordVisible ? "text" : "password"}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                </InputGroup>
                 {field.state.meta.errors.map((error) => (
                   <p key={error?.message} className="text-sm text-destructive">
                     {error?.message}
@@ -144,13 +157,16 @@ export default function SignInForm({
         </form.Subscribe>
       </form>
 
-      {onSwitchToSignUp && (
-        <div className="mt-4 text-center">
-          <Button variant="link" onClick={onSwitchToSignUp}>
-            Need an authorized admin account? Register
-          </Button>
-        </div>
-      )}
+      <div className="mt-4 text-center">
+        <Button
+          variant="link"
+          onClick={() => {
+            navigate({ to: "/register" });
+          }}
+        >
+          Need an authorized admin account? Register
+        </Button>
+      </div>
     </div>
   );
 }
