@@ -1,3 +1,4 @@
+import { api } from "@bus-booking/backend/convex/_generated/api";
 import { Button } from "@bus-booking/ui/components/button";
 import { Card } from "@bus-booking/ui/components/card";
 import {
@@ -5,16 +6,17 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@bus-booking/ui/components/field";
-
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@bus-booking/ui/components/input-group";
+import { adToBs, formattedDate } from "@bus-booking/ui/lib/utils";
 import type { BSDate } from "bikram-sambat-react";
 import { NepaliDatePicker } from "bikram-sambat-react";
 import "bikram-sambat-react/styles.css";
+import { useMutation } from "convex/react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -26,15 +28,54 @@ import {
   User,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function BookingForm() {
+  const today = new Date();
+  const todayBs = adToBs(today);
+
   const [passengers, setPassengers] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [date, setDate] = useState<BSDate>();
 
-  function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
+  const createBooking = useMutation(api.bookings.create);
+
+  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    setError(null);
+    setIsSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
+    const name = (formData.get("name") as string)?.trim() || "";
+    const phone = (formData.get("phone") as string)?.trim() || "";
+    const email = (formData.get("email") as string)?.trim() || "";
+    const from = (formData.get("from") as string)?.trim() || "";
+    const to = (formData.get("to") as string)?.trim() || "";
+
+    try {
+      await createBooking({
+        name,
+        phone,
+        email,
+        from,
+        to,
+        passengers,
+        travelDate: formattedDate(date),
+      });
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Failed to create booking:", err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to save booking. Please try again.";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
   if (submitted) {
     return (
@@ -84,8 +125,10 @@ export function BookingForm() {
                 <InputGroupInput
                   id="phone"
                   name="phone"
-                  type="number"
+                  inputMode="numeric"
                   placeholder="98XXXXXXXX"
+                  minLength={10}
+                  maxLength={10}
                   required
                 />
               </InputGroup>
@@ -111,6 +154,8 @@ export function BookingForm() {
                 value={date}
                 onChange={setDate}
                 id="travel_date"
+                required
+                minDate={todayBs}
                 clearable
                 iconPosition="start"
                 className="w-full"
@@ -189,8 +234,18 @@ export function BookingForm() {
             </Field>
           </div>
 
-          <Button size={"xxl"} type="submit" className={"w-max px-8 ml-auto"}>
-            Find my trip <ArrowRight aria-hidden="true" />
+          {error && (
+            <p className="text-sm font-medium text-destructive">{error}</p>
+          )}
+
+          <Button
+            size={"xxl"}
+            type="submit"
+            disabled={isSubmitting}
+            className={"w-max px-8 ml-auto"}
+          >
+            {isSubmitting ? "Submitting..." : "Find my trip"}{" "}
+            <ArrowRight aria-hidden="true" />
           </Button>
         </FieldGroup>
       </form>

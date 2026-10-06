@@ -6,6 +6,7 @@
   "exports": {
     "./globals.css": "./src/styles/globals.css",
     "./lib/*": "./src/lib/*.ts",
+    "./components/data-table": "./src/components/data-table/index.tsx",
     "./components/*": "./src/components/*.tsx",
     "./hooks/*": "./src/hooks/*.ts",
     "./postcss.config": "./postcss.config.mjs"
@@ -16,9 +17,11 @@
   "dependencies": {
     "@base-ui/react": "^1.8.0",
     "@shadcn/react": "^0.3.1",
+    "@tanstack/react-table": "^9.2.6",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.2.5",
     "lucide-react": "catalog:",
+    "nepali-date-converter": "^3.4.0",
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
