@@ -1,65 +1,133 @@
-import { action } from "./_generated/server";
 import { v } from "convex/values";
+import {
+  action,
+  type ActionCtx,
+  type MutationCtx,
+  type QueryCtx,
+} from "./_generated/server";
 import { createAuth } from "./auth";
 
-function isAuthorizedAdminEmail(email: string): boolean {
-  const rawEmails = process.env.ADMIN_EMAILS || "suzu9869@gmail.com";
+/**
+ * Server-side authorization helper for Convex functions.
+ * Validates that the caller is authenticated and that their email is in ADMIN_EMAILS.
+ * Throws "Unauthorized" otherwise.
+ */
+export async function requireAdmin(ctx: QueryCtx | MutationCtx | ActionCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity || !identity.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const rawEmails = process.env.ADMIN_EMAILS || "";
   const allowedEmails = rawEmails
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
-  return allowedEmails.includes(email.trim().toLowerCase());
+
+  const userEmail = identity.email.trim().toLowerCase();
+  if (!allowedEmails.includes(userEmail)) {
+    throw new Error("Unauthorized");
+  }
+
+  return { identity, email: userEmail };
 }
 
-export const sendRegistrationOTP = action({
-  args: {
-    email: v.string(),
-    password: v.string(),
-    name: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const email = args.email.trim().toLowerCase();
-    if (!isAuthorizedAdminEmail(email)) {
-      throw new Error("This email is not authorized to register as an admin.");
-    }
-
+/**
+ * List registered admin users.
+ * Protected by requireAdmin.
+ */
+export const listAdminUsers = action({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
     const auth = createAuth(ctx);
-
-    await auth.api.signUpEmail({
-      body: {
-        email,
-        password: args.password,
-        name: args.name,
+    const res = await auth.api.listUsers({
+      query: {
+        limit: 100,
       },
     });
-
-    await auth.api.sendVerificationOTP({
-      body: {
-        email,
-        type: "email-verification",
-      },
-    });
-
-    return { success: true, message: "Verification OTP code sent to email." };
+    return res.users.map((u: any) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      createdAt: u.createdAt,
+    }));
   },
 });
 
-export const sendPasswordResetOTP = action({
+/**
+ * Admin action to reset another admin's password via userId.
+ * Protected by requireAdmin.
+ */
+export const resetAdminPassword = action({
   args: {
-    email: v.string(),
+    userId: v.string(),
+    newPassword: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const auth = createAuth(ctx);
-    const email = args.email.trim().toLowerCase();
 
-    // Trigger password reset OTP
-    await auth.api.sendVerificationOTP({
+    if (!args.newPassword || args.newPassword.length < 8) {
+      throw new Error("Password must be at least 8 characters long.");
+    }
+
+    await auth.api.setUserPassword({
       body: {
-        email,
-        type: "forget-password",
+        userId: args.userId,
+        newPassword: args.newPassword,
       },
     });
 
-    return { success: true, message: "Password reset OTP sent to email." };
+    return { success: true, message: "User password updated successfully." };
+  },
+});
+
+/**
+ * Admin action to reset another admin's password by email.
+ * Protected by requireAdmin.
+ */
+export const resetAdminPasswordByEmail = action({
+  args: {
+    email: v.string(),
+    newPassword: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const auth = createAuth(ctx);
+    const email = args.email.trim().toLowerCase();
+
+    if (!args.newPassword || args.newPassword.length < 8) {
+      throw new Error("Password must be at least 8 characters long.");
+    }
+
+    const usersRes = await auth.api.listUsers({
+      query: {
+        searchValue: email,
+        searchField: "email",
+        searchOperator: "contains",
+      },
+    });
+
+    const user = usersRes.users.find(
+      (u: { email: string }) => u.email.toLowerCase() === email,
+    );
+
+    if (!user) {
+      throw new Error(`Admin user with email "${email}" not found.`);
+    }
+
+    await auth.api.setUserPassword({
+      body: {
+        userId: user.id,
+        newPassword: args.newPassword,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Password for ${email} updated successfully.`,
+    };
   },
 });

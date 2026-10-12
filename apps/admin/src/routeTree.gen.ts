@@ -11,12 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as ProtectedRouteImport } from './routes/_protected'
-import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
-import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
-import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
-import { Route as AuthVerifyEmailRouteImport } from './routes/_auth/verify-email'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
+import { Route as ProtectedChangePasswordRouteImport } from './routes/_protected/change-password'
+import { Route as ProtectedResetAdminPasswordRouteImport } from './routes/_protected/reset-admin-password'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const AuthRoute = AuthRouteImport.update({
@@ -27,29 +25,9 @@ const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
-  id: '/verify-email',
-  path: '/verify-email',
   getParentRoute: () => AuthRoute,
 } as any)
 const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
@@ -57,6 +35,17 @@ const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedChangePasswordRoute = ProtectedChangePasswordRouteImport.update({
+  id: '/change-password',
+  path: '/change-password',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedResetAdminPasswordRoute =
+  ProtectedResetAdminPasswordRouteImport.update({
+    id: '/reset-admin-password',
+    path: '/reset-admin-password',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -65,31 +54,25 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
-  '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
-  '/reset-password': typeof AuthResetPasswordRoute
-  '/verify-email': typeof AuthVerifyEmailRoute
+  '/change-password': typeof ProtectedChangePasswordRoute
+  '/reset-admin-password': typeof ProtectedResetAdminPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof ProtectedIndexRoute
-  '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
-  '/reset-password': typeof AuthResetPasswordRoute
-  '/verify-email': typeof AuthVerifyEmailRoute
+  '/change-password': typeof ProtectedChangePasswordRoute
+  '/reset-admin-password': typeof ProtectedResetAdminPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/_protected': typeof ProtectedRouteWithChildren
-  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
-  '/_auth/register': typeof AuthRegisterRoute
-  '/_auth/reset-password': typeof AuthResetPasswordRoute
-  '/_auth/verify-email': typeof AuthVerifyEmailRoute
+  '/_protected/change-password': typeof ProtectedChangePasswordRoute
+  '/_protected/reset-admin-password': typeof ProtectedResetAdminPasswordRoute
   '/_protected/': typeof ProtectedIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -97,30 +80,24 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/forgot-password'
     | '/login'
-    | '/register'
-    | '/reset-password'
-    | '/verify-email'
+    | '/change-password'
+    | '/reset-admin-password'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/forgot-password'
     | '/login'
-    | '/register'
-    | '/reset-password'
-    | '/verify-email'
+    | '/change-password'
+    | '/reset-admin-password'
     | '/api/auth/$'
   id:
     | '__root__'
     | '/_auth'
     | '/_protected'
-    | '/_auth/forgot-password'
     | '/_auth/login'
-    | '/_auth/register'
-    | '/_auth/reset-password'
-    | '/_auth/verify-email'
+    | '/_protected/change-password'
+    | '/_protected/reset-admin-password'
     | '/_protected/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -147,13 +124,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth/forgot-password': {
-      id: '/_auth/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
@@ -161,32 +131,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/register': {
-      id: '/_auth/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/reset-password': {
-      id: '/_auth/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/verify-email': {
-      id: '/_auth/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof AuthVerifyEmailRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_protected/': {
       id: '/_protected/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof ProtectedIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/change-password': {
+      id: '/_protected/change-password'
+      path: '/change-password'
+      fullPath: '/change-password'
+      preLoaderRoute: typeof ProtectedChangePasswordRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/reset-admin-password': {
+      id: '/_protected/reset-admin-password'
+      path: '/reset-admin-password'
+      fullPath: '/reset-admin-password'
+      preLoaderRoute: typeof ProtectedResetAdminPasswordRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/api/auth/$': {
@@ -200,28 +163,24 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteChildren {
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
-  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
-  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
-  AuthResetPasswordRoute: AuthResetPasswordRoute,
-  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ProtectedRouteChildren {
+  ProtectedChangePasswordRoute: typeof ProtectedChangePasswordRoute
+  ProtectedResetAdminPasswordRoute: typeof ProtectedResetAdminPasswordRoute
   ProtectedIndexRoute: typeof ProtectedIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedChangePasswordRoute: ProtectedChangePasswordRoute,
+  ProtectedResetAdminPasswordRoute: ProtectedResetAdminPasswordRoute,
   ProtectedIndexRoute: ProtectedIndexRoute,
 }
 

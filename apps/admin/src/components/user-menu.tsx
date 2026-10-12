@@ -10,12 +10,15 @@ import {
   DropdownMenuTrigger,
 } from "@bus-booking/ui/components/dropdown-menu";
 import { useQuery } from "convex/react";
+import { useNavigate } from "@tanstack/react-router";
+import { KeyRound, LogOut, ShieldAlert, User as UserIcon } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 import { getAvatarName } from "@bus-booking/ui/lib/utils";
 
 export default function UserMenu() {
   const user = useQuery(api.auth.getCurrentUser);
+  const navigate = useNavigate();
 
   return (
     <DropdownMenu>
@@ -23,31 +26,52 @@ export default function UserMenu() {
         render={
           <Button
             variant="outline"
-            className={"rounded-full"}
-            size={"icon-lg"}
+            className="rounded-full font-semibold"
+            size="icon-lg"
           />
         }
       >
         {getAvatarName(user?.name)}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-card min-w-36">
+      <DropdownMenuContent className="bg-card min-w-56 p-1.5 shadow-lg">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel className="px-2 py-1.5">
+            <div className="font-semibold text-sm">{user?.name || "Administrator"}</div>
+            <div className="text-xs text-muted-foreground font-normal truncate">
+              {user?.email}
+            </div>
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>{user?.email}</DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer gap-2"
+            onClick={() => navigate({ to: "/change-password" })}
+          >
+            <KeyRound className="size-4 text-muted-foreground" />
+            <span>Change My Password</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer gap-2"
+            onClick={() => navigate({ to: "/reset-admin-password" })}
+          >
+            <ShieldAlert className="size-4 text-muted-foreground" />
+            <span>Reset Admin Password</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
+            className="cursor-pointer gap-2"
             onClick={() => {
               authClient.signOut({
                 fetchOptions: {
                   onSuccess: () => {
-                    location.reload();
+                    location.href = "/login";
                   },
                 },
               });
             }}
           >
-            Sign Out
+            <LogOut className="size-4" />
+            <span>Sign Out</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

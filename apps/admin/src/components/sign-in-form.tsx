@@ -1,5 +1,4 @@
 import { Button } from "@bus-booking/ui/components/button";
-import { Input } from "@bus-booking/ui/components/input";
 import { Label } from "@bus-booking/ui/components/label";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
@@ -13,7 +12,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@bus-booking/ui/components/input-group";
-import { Eye, EyeClosed } from "lucide-react";
+import { Eye, EyeClosed, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 
 export default function SignInForm() {
@@ -28,7 +27,7 @@ export default function SignInForm() {
     onSubmit: async ({ value }) => {
       await authClient.signIn.email(
         {
-          email: value.email,
+          email: value.email.trim().toLowerCase(),
           password: value.password,
         },
         {
@@ -37,135 +36,139 @@ export default function SignInForm() {
               to: "/",
               search: { page: 1, pageSize: 10 },
             });
-            toast.success("Sign in successful");
+            toast.success("Signed in successfully");
           },
           onError: (error) => {
-            toast.error(error.error.message || error.error.statusText);
+            toast.error(
+              error.error.message ||
+                error.error.statusText ||
+                "Failed to sign in",
+            );
           },
         },
       );
     },
     validators: {
       onSubmit: z.object({
-        email: z.email("Invalid email address"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
+        email: z.string().email("Invalid email address"),
+        password: z.string().min(1, "Password is required"),
       }),
     },
   });
 
   return (
-    <div className="mx-auto mt-10 w-full max-w-md p-6">
-      <h1 className="mb-2 text-center text-3xl font-bold">Admin Portal</h1>
-      <p className="mb-6 text-center text-sm text-muted-foreground">
-        Sign in with your admin credentials to access the dashboard.
-      </p>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-        className="space-y-4"
-      >
-        <div>
-          <form.Field name="email">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  placeholder="suzu9869@gmail.com"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-sm text-destructive">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
+    <div className="mx-auto mt-16 w-full max-w-md p-6">
+      <div className="mb-8 text-center">
+        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <Lock className="size-6" />
         </div>
+        <h1 className="text-2xl font-bold tracking-tight">Admin Portal</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Sign in with your administrator account to access bookings.
+        </p>
+      </div>
 
-        <div>
-          <form.Field name="password">
-            {(field) => (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor={field.name}>Password</Label>
-
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="h-auto p-0 text-xs"
-                    onClick={() => {
-                      navigate({ to: "/forgot-password" });
-                    }}
-                  >
-                    Forgot Password?
-                  </Button>
-                </div>
-                <InputGroup>
-                  <InputGroupAddon align={"inline-end"}>
-                    <InputGroupButton
-                      onClick={() => {
-                        setPasswordVisible((prev) => !prev);
-                      }}
-                    >
-                      {passwordVisible ? <Eye /> : <EyeClosed />}
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                  <InputGroupInput
-                    id={field.name}
-                    name={field.name}
-                    type={passwordVisible ? "text" : "password"}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </InputGroup>
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-sm text-destructive">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
-
-        <form.Subscribe
-          selector={(state) => ({
-            canSubmit: state.canSubmit,
-            isSubmitting: state.isSubmitting,
-          })}
-        >
-          {({ canSubmit, isSubmitting }) => (
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={!canSubmit || isSubmitting}
-            >
-              {isSubmitting ? "Signing in..." : "Sign In"}
-            </Button>
-          )}
-        </form.Subscribe>
-      </form>
-
-      <div className="mt-4 text-center">
-        <Button
-          variant="link"
-          onClick={() => {
-            navigate({ to: "/register" });
+      <div className="rounded-2xl border bg-card p-6 shadow-xs">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
           }}
+          className="space-y-4"
         >
-          Need an authorized admin account? Register
-        </Button>
+          <div>
+            <form.Field name="email">
+              {(field) => (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Email address</Label>
+                  <InputGroup>
+                    <InputGroupAddon align="inline-start">
+                      <Mail className="size-4 text-muted-foreground" />
+                    </InputGroupAddon>
+                    <InputGroupInput
+                      id={field.name}
+                      name={field.name}
+                      type="email"
+                      placeholder="admin@example.com"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                  </InputGroup>
+                  {field.state.meta.errors.map((error) => (
+                    <p
+                      key={error?.message}
+                      className="text-xs text-destructive"
+                    >
+                      {error?.message}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </form.Field>
+          </div>
+
+          <div>
+            <form.Field name="password">
+              {(field) => (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Password</Label>
+                  <InputGroup>
+                    <InputGroupInput
+                      id={field.name}
+                      name={field.name}
+                      type={passwordVisible ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupButton
+                        type="button"
+                        onClick={() => {
+                          setPasswordVisible((prev) => !prev);
+                        }}
+                      >
+                        {passwordVisible ? (
+                          <Eye className="size-4" />
+                        ) : (
+                          <EyeClosed className="size-4" />
+                        )}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  {field.state.meta.errors.map((error) => (
+                    <p
+                      key={error?.message}
+                      className="text-xs text-destructive"
+                    >
+                      {error?.message}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </form.Field>
+          </div>
+
+          <form.Subscribe
+            selector={(state) => ({
+              canSubmit: state.canSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+          >
+            {({ canSubmit, isSubmitting }) => (
+              <Button
+                type="submit"
+                className="w-full mt-2 h-12"
+                disabled={!canSubmit || isSubmitting}
+              >
+                {isSubmitting ? "Signing in..." : "Sign In to Admin"}
+              </Button>
+            )}
+          </form.Subscribe>
+        </form>
       </div>
     </div>
   );

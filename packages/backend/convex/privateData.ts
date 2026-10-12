@@ -1,17 +1,12 @@
 import { query } from "./_generated/server";
-import { authComponent } from "./auth";
+import { requireAdmin } from "./adminAuth";
 
 export const get = query({
   args: {},
   handler: async (ctx) => {
-    const authUser = await authComponent.safeGetAuthUser(ctx);
-    if (!authUser) {
-      return {
-        message: "Not authenticated",
-      };
-    }
+    await requireAdmin(ctx);
     return {
-      message: "This is private",
+      message: "This is private admin data.",
     };
   },
 });
