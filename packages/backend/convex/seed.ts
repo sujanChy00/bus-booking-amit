@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { action } from "./_generated/server";
+import { internalAction } from "./_generated/server";
 import { createAuth } from "./auth";
 
 /**
@@ -9,7 +9,7 @@ import { createAuth } from "./auth";
  * Example usage:
  * npx convex run seed:createAdminAccount '{"email":"admin@example.com","password":"SecurePassword123!","name":"Admin"}'
  */
-export const createAdminAccount = action({
+export const createAdminAccount = internalAction({
   args: {
     email: v.string(),
     password: v.string(),
