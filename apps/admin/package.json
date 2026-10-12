@@ -26,6 +26,7 @@
     "convex": "catalog:",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",
+    "nitro": "^3.0.260903-beta",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sonner": "catalog:",
