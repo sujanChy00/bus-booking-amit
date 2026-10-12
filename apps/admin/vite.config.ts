@@ -9,7 +9,7 @@ export default defineConfig({
   server: { port: 3001 },
   resolve: {
     tsconfigPaths: true,
-    // dedupe: ["react", "react-dom"],
+    dedupe: ["react", "react-dom"],
   },
   plugins: [
     varlockVitePlugin({ ssrInjectMode: "resolved-env" }),
@@ -19,6 +19,6 @@ export default defineConfig({
     viteReact(),
   ],
   ssr: {
-    noExternal: ["@convex-dev/better-auth", "nepali-date-converter"],
+    noExternal: true,
   },
 });
