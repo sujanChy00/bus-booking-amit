@@ -6,11 +6,10 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  server: {
-    port: 3001,
-  },
+  server: { port: 3001 },
   resolve: {
     tsconfigPaths: true,
+    dedupe: ["react", "react-dom"],
   },
   plugins: [
     varlockVitePlugin({ ssrInjectMode: "resolved-env" }),
@@ -20,11 +19,6 @@ export default defineConfig({
     viteReact(),
   ],
   ssr: {
-    noExternal: [
-      "@convex-dev/better-auth",
-      "nepali-date-converter",
-      "react",
-      "react-dom",
-    ],
+    noExternal: ["@convex-dev/better-auth", "nepali-date-converter"],
   },
 });
