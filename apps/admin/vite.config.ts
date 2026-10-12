@@ -5,7 +5,7 @@ import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   server: { port: 3001 },
   resolve: {
     tsconfigPaths: true,
@@ -19,6 +19,9 @@ export default defineConfig({
     viteReact(),
   ],
   ssr: {
-    noExternal: true,
+    noExternal:
+      command === "build"
+        ? true
+        : ["@convex-dev/better-auth", "nepali-date-converter"],
   },
-});
+}));

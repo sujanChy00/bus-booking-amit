@@ -1,5 +1,5 @@
 import { api } from "@bus-booking/backend/convex/_generated/api";
-import type { Id } from "@bus-booking/backend/convex/_generated/dataModel";
+import type { BookingResponse } from "@bus-booking/backend/convex/bookings";
 import { Button } from "@bus-booking/ui/components/button";
 import {
   DropdownMenu,
@@ -16,9 +16,8 @@ import { useMutation } from "convex/react";
 import { MoreHorizontal, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Booking } from "./booking-data-table";
 
-export const BookingTableActions = ({ data }: { data: Booking }) => {
+export const BookingTableActions = ({ data }: { data: BookingResponse }) => {
   const [status, setStatus] = useState(data.status ?? "pending");
   const [isPending, setIsPending] = useState(false);
 
@@ -34,7 +33,7 @@ export const BookingTableActions = ({ data }: { data: Booking }) => {
 
     try {
       await updateStatus({
-        id: data._id as Id<"bookings">,
+        id: data._id,
         status: newStatus,
       });
       toast.success(`Booking marked as ${newStatus}.`);
@@ -60,7 +59,7 @@ export const BookingTableActions = ({ data }: { data: Booking }) => {
     setIsPending(true);
 
     try {
-      await removeBooking({ id: data._id as Id<"bookings"> });
+      await removeBooking({ id: data._id });
       toast.success("Booking deleted.");
     } catch (error) {
       toast.error(

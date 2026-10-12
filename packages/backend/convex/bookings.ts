@@ -1,5 +1,6 @@
-import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import type { Doc, Id } from "./_generated/dataModel";
+import { mutation, query } from "./_generated/server";
 import { requireAdmin } from "./adminAuth";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,13 +35,17 @@ export const create = mutation({
     if (!to) throw new Error("Destination location (To) is required.");
 
     // 2. Length validations
-    if (name.length > 100) throw new Error("Name cannot exceed 100 characters.");
+    if (name.length > 100)
+      throw new Error("Name cannot exceed 100 characters.");
     if (phone.length < 7 || phone.length > 20) {
       throw new Error("Phone number must be between 7 and 20 characters.");
     }
-    if (email.length > 100) throw new Error("Email cannot exceed 100 characters.");
-    if (from.length > 100) throw new Error("Departure cannot exceed 100 characters.");
-    if (to.length > 100) throw new Error("Destination cannot exceed 100 characters.");
+    if (email.length > 100)
+      throw new Error("Email cannot exceed 100 characters.");
+    if (from.length > 100)
+      throw new Error("Departure cannot exceed 100 characters.");
+    if (to.length > 100)
+      throw new Error("Destination cannot exceed 100 characters.");
 
     // 3. Format validations
     if (!EMAIL_REGEX.test(email)) {
@@ -199,3 +204,6 @@ export const remove = mutation({
     return { success: true };
   },
 });
+
+export type BookingResponse = Doc<"bookings">;
+export type BookingId = Id<"bookings">;

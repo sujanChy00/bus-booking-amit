@@ -1,3 +1,4 @@
+import type { BookingResponse } from "@bus-booking/backend/convex/bookings";
 import { Badge } from "@bus-booking/ui/components/badge";
 import { Button } from "@bus-booking/ui/components/button";
 import {
@@ -31,19 +32,6 @@ import {
 } from "lucide-react";
 import { BookingTableActions } from "./booking-table-actions";
 
-export interface Booking {
-  _id: string;
-  name: string;
-  phone: string;
-  email: string;
-  travelDate?: string;
-  passengers: number;
-  from: string;
-  to: string;
-  status: string;
-  createdAt: number;
-}
-
 const PAGE_SIZE_OPTIONS = [
   { label: "10 per page", value: 10 },
   { label: "20 per page", value: 20 },
@@ -51,7 +39,7 @@ const PAGE_SIZE_OPTIONS = [
 ];
 
 interface BookingDataTableProps {
-  data: Booking[];
+  data: BookingResponse[];
   page: number;
   pageSize: number;
   onPageChange: (newPage: number) => void;
