@@ -20,6 +20,6 @@ export default defineConfig({
     viteReact(),
   ],
   ssr: {
-    noExternal: ["@convex-dev/better-auth", "nepali-date-converter"],
+    noExternal: ["@convex-dev/better-auth", "nepali-date-converter", "react", "react-dom"],
   },
 });
