@@ -14,7 +14,6 @@ export default defineConfig({
   },
   plugins: [
     varlockVitePlugin({ ssrInjectMode: "resolved-env" }),
-    // varlockVitePlugin({ ssrInjectMode: "auto-load" }),
     tailwindcss(),
     tanstackStart(),
     nitro(),
