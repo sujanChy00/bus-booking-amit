@@ -1,3 +1,4 @@
+import { BookingStatus } from "@bus-booking/backend/convex/bookings";
 import { Button } from "@bus-booking/ui/components/button";
 import {
   InputGroup,
@@ -5,6 +6,13 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@bus-booking/ui/components/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@bus-booking/ui/components/select";
 import {
   convertToBsDateStructure,
   formattedDate,
@@ -26,25 +34,20 @@ import { useState } from "react";
 export const BookingsFilter = () => {
   const search = useSearch({
     from: "/_protected/",
-  }) as {
-    name?: string;
-    phone?: string;
-    destination?: string;
-    travelDate?: string;
-    sortDate?: "asc" | "desc";
-    page?: number;
-    pageSize?: number;
-  };
+  });
 
   const navigate = useNavigate({ from: "/" });
   const [userName, setUserName] = useState(search.name ?? "");
+  const [status, setStatus] = useState<BookingStatus | undefined>(
+    search.status,
+  );
   const [phoneNumber, setPhoneNumber] = useState(search.phone ?? "");
   const [dest, setDest] = useState(search.destination ?? "");
   const [date, setDate] = useState<BSDate | undefined>(
     convertToBsDateStructure(search.travelDate),
   );
 
-  const onFilter = (e?: React.FormEvent) => {
+  const onFilter = (e?: React.SubmitEvent) => {
     if (e) e.preventDefault();
     navigate({
       to: "/",
@@ -55,6 +58,7 @@ export const BookingsFilter = () => {
         phone: phoneNumber.trim() || undefined,
         destination: dest.trim() || undefined,
         travelDate: formattedDate(date) || undefined,
+        status: status || undefined,
       }),
     });
   };
@@ -63,6 +67,7 @@ export const BookingsFilter = () => {
     setUserName("");
     setPhoneNumber("");
     setDest("");
+    setStatus(undefined);
     setDate(undefined);
     navigate({
       to: "/",
@@ -95,6 +100,7 @@ export const BookingsFilter = () => {
     Boolean(search.phone) ||
     Boolean(search.destination) ||
     Boolean(search.travelDate) ||
+    Boolean(search.status) ||
     Boolean(search.sortDate);
 
   return (
@@ -102,7 +108,7 @@ export const BookingsFilter = () => {
       onSubmit={onFilter}
       className="flex flex-col gap-3 rounded-2xl border bg-card p-4 shadow-xs"
     >
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {/* Name filter */}
         <InputGroup>
           <InputGroupAddon align="inline-start">
@@ -110,7 +116,16 @@ export const BookingsFilter = () => {
           </InputGroupAddon>
           <InputGroupInput
             value={userName}
-            onChange={(e) => setUserName(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value.trim();
+              setUserName(value);
+              if (!value) {
+                navigate({
+                  to: "/",
+                  search: (prev) => ({ ...prev, name: undefined, page: 1 }),
+                });
+              }
+            }}
             placeholder="Filter by name..."
           />
           {userName && (
@@ -138,7 +153,16 @@ export const BookingsFilter = () => {
           </InputGroupAddon>
           <InputGroupInput
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value.trim();
+              setPhoneNumber(value);
+              if (!value) {
+                navigate({
+                  to: "/",
+                  search: (prev) => ({ ...prev, phone: undefined, page: 1 }),
+                });
+              }
+            }}
             placeholder="Filter by phone..."
             maxLength={10}
           />
@@ -167,7 +191,20 @@ export const BookingsFilter = () => {
           </InputGroupAddon>
           <InputGroupInput
             value={dest}
-            onChange={(e) => setDest(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value.trim();
+              setDest(value);
+              if (!value) {
+                navigate({
+                  to: "/",
+                  search: (prev) => ({
+                    ...prev,
+                    destination: undefined,
+                    page: 1,
+                  }),
+                });
+              }
+            }}
             placeholder="Filter by destination..."
           />
           {dest && (
@@ -191,6 +228,20 @@ export const BookingsFilter = () => {
             </InputGroupAddon>
           )}
         </InputGroup>
+
+        <Select
+          value={status}
+          onValueChange={(v) => setStatus(v as BookingStatus)}
+        >
+          <SelectTrigger className={"w-full py-5"}>
+            <SelectValue placeholder="Filter by Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={"pending"}>Pending</SelectItem>
+            <SelectItem value={"confirmed"}>Confirmed</SelectItem>
+            <SelectItem value={"cancelled"}>Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
 
         {/* Travel Date filter */}
         <ClientOnly

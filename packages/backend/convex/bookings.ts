@@ -2,12 +2,17 @@ import { Infer, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { requireAdmin } from "./adminAuth";
-import { bookingStatus } from "./schema";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
 const MAX_BOOKINGS_PER_WINDOW = 3;
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+
+export const bookingStatus = v.union(
+  v.literal("pending"),
+  v.literal("confirmed"),
+  v.literal("cancelled"),
+);
 
 export const create = mutation({
   args: {
@@ -144,6 +149,7 @@ export const list = query({
     phone: v.optional(v.string()),
     destination: v.optional(v.string()),
     travelDate: v.optional(v.string()),
+    status: v.optional(bookingStatus),
   },
   handler: async (ctx, args) => {
     // Strictly require admin privileges
@@ -175,6 +181,10 @@ export const list = query({
       bookings = bookings.filter(
         (b) => b.travelDate && b.travelDate.includes(q),
       );
+    }
+
+    if (args.status) {
+      bookings = bookings.filter((b) => b.status === args.status);
     }
 
     return bookings;

@@ -18,6 +18,10 @@ const searchSchema = z.object({
   destination: z.string().optional().catch(""),
   travelDate: z.string().optional().catch(""),
   sortDate: z.enum(["asc", "desc"]).optional().catch(undefined),
+  status: z
+    .enum(["pending", "cancelled", "confirmed"])
+    .optional()
+    .catch(undefined),
 });
 
 export const Route = createFileRoute("/_protected/")({
@@ -37,6 +41,7 @@ function DashboardPage() {
     phone: search.phone || undefined,
     destination: search.destination || undefined,
     travelDate: search.travelDate || undefined,
+    status: search.status || undefined,
   });
 
   // Client-side sort by travel date if requested
