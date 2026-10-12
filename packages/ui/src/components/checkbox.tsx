@@ -1,5 +1,3 @@
-"use client";
-
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
 import { cn } from "@bus-booking/ui/lib/utils";
 import { CheckIcon } from "lucide-react";

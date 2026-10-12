@@ -144,7 +144,7 @@ export function BookingForm() {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="alex@example.com"
+                  placeholder="user@example.com"
                   required
                 />
               </InputGroup>

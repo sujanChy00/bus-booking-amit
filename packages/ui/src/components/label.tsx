@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@bus-booking/ui/lib/utils";
 import * as React from "react";
 

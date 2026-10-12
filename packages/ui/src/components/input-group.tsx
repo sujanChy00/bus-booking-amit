@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@bus-booking/ui/components/button";
 import { Input } from "@bus-booking/ui/components/input";
 import { Textarea } from "@bus-booking/ui/components/textarea";
