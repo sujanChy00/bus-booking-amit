@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "convex dev",
     "dev:setup": "convex dev --configure --until-success",
+    "deploy": "convex deply",
     "admin:reset": "bun scripts/admin-cli.ts reset",
     "admin:create": "bun scripts/admin-cli.ts create"
   },
