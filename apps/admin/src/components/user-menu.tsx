@@ -9,9 +9,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@bus-booking/ui/components/dropdown-menu";
-import { useQuery } from "convex/react";
 import { useNavigate } from "@tanstack/react-router";
-import { KeyRound, LogOut, ShieldAlert, User as UserIcon } from "lucide-react";
+import { useQuery } from "convex/react";
+import { KeyRound, LogOut, ShieldAlert } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 import { getAvatarName } from "@bus-booking/ui/lib/utils";
@@ -33,10 +33,12 @@ export default function UserMenu() {
       >
         {getAvatarName(user?.name)}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-card min-w-56 p-1.5 shadow-lg">
-        <DropdownMenuGroup>
+      <DropdownMenuContent className="min-w-56">
+        <DropdownMenuGroup className={"space-y-1"}>
           <DropdownMenuLabel className="px-2 py-1.5">
-            <div className="font-semibold text-sm">{user?.name || "Administrator"}</div>
+            <div className="font-semibold text-sm">
+              {user?.name || "Administrator"}
+            </div>
             <div className="text-xs text-muted-foreground font-normal truncate">
               {user?.email}
             </div>

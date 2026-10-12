@@ -44,3 +44,27 @@ export const createAdminAccount = internalAction({
     }
   },
 });
+
+export const resetPasswordByEmail = internalAction({
+  args: { email: v.string(), newPassword: v.string() },
+  handler: async (ctx, args) => {
+    if (args.newPassword.length < 8) throw new Error("Password too short.");
+    const auth = createAuth(ctx);
+    const email = args.email.trim().toLowerCase();
+
+    const res = await auth.api.listUsers({
+      query: {
+        searchValue: email,
+        searchField: "email",
+        searchOperator: "contains",
+      },
+    });
+    const user = res.users.find((u) => u.email.toLowerCase() === email);
+    if (!user) throw new Error("User not found.");
+
+    await auth.api.setUserPassword({
+      body: { userId: user.id, newPassword: args.newPassword },
+    });
+    return { success: true };
+  },
+});

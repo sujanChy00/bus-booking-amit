@@ -3,12 +3,12 @@ import { Button } from "@bus-booking/ui/components/button";
 import { Container } from "@bus-booking/ui/components/container";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
-import { AlertCircle, KeyRound, Loader2, LogOut, ShieldAlert } from "lucide-react";
+import { KeyRound, Loader2 } from "lucide-react";
 import z from "zod";
 
 import { BookingDataTable } from "@/components/booking-data-table";
 import { BookingsFilter } from "@/components/bookings-filter";
-import { authClient } from "@/lib/auth-client";
+import { UnauthorizedErrorView } from "@/components/unauthorized-error-view";
 
 const searchSchema = z.object({
   page: z.coerce.number().optional().default(1).catch(1),
@@ -22,49 +22,11 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_protected/")({
   validateSearch: (search) => searchSchema.parse(search),
-  errorComponent: ({ error }) => <UnauthorizedErrorView error={error} />,
+  errorComponent: ({ error }) => (
+    <UnauthorizedErrorView error={error as Error} />
+  ),
   component: DashboardPage,
 });
-
-function UnauthorizedErrorView({ error }: { error?: Error }) {
-  const isUnauthorized =
-    error?.message?.includes("Unauthorized") ||
-    error?.message?.includes("Admin");
-
-  return (
-    <Container className="max-w-md py-20 text-center space-y-4">
-      <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
-        <ShieldAlert className="size-8" />
-      </div>
-      <h2 className="text-2xl font-bold tracking-tight">
-        {isUnauthorized ? "Unauthorized Access" : "Access Error"}
-      </h2>
-      <p className="text-sm text-muted-foreground">
-        {isUnauthorized
-          ? "Your account does not have administrator privileges to view or manage bookings. Please sign in with an authorized admin account."
-          : (error?.message || "An unexpected error occurred while loading admin data.")}
-      </p>
-      <div className="pt-2 flex justify-center gap-3">
-        <Button
-          variant="outline"
-          onClick={() => {
-            authClient.signOut({
-              fetchOptions: {
-                onSuccess: () => {
-                  location.href = "/login";
-                },
-              },
-            });
-          }}
-          className="gap-2"
-        >
-          <LogOut className="size-4" />
-          <span>Sign Out</span>
-        </Button>
-      </div>
-    </Container>
-  );
-}
 
 function DashboardPage() {
   const search = Route.useSearch();

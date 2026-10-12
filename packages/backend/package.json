@@ -6,7 +6,9 @@
   "author": "",
   "scripts": {
     "dev": "convex dev",
-    "dev:setup": "convex dev --configure --until-success"
+    "dev:setup": "convex dev --configure --until-success",
+    "admin:reset": "bun scripts/admin-cli.ts reset",
+    "admin:create": "bun scripts/admin-cli.ts create"
   },
   "dependencies": {
     "@convex-dev/better-auth": "catalog:",

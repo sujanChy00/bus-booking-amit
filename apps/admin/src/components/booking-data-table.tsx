@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@bus-booking/ui/components/table";
-import { formatBookingDateTime } from "@bus-booking/ui/lib/utils";
+import { cn, formatBookingDateTime } from "@bus-booking/ui/lib/utils";
 import {
   Calendar,
   ChevronLeft,
@@ -29,6 +29,7 @@ import {
   User,
   Users,
 } from "lucide-react";
+import { BookingTableActions } from "./booking-table-actions";
 
 export interface Booking {
   _id: string;
@@ -124,14 +125,20 @@ export function BookingDataTable({
                   Booked On
                 </div>
               </TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length > 0 ? (
               paginatedData.map((booking) => (
-                <TableRow key={booking._id} className="hover:bg-muted/30 transition-colors">
+                <TableRow
+                  key={booking._id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
                   <TableCell className="font-medium">
-                    <span className="text-foreground font-semibold">{booking.name}</span>
+                    <span className="text-foreground font-semibold">
+                      {booking.name}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm font-mono text-muted-foreground">
@@ -155,7 +162,10 @@ export function BookingDataTable({
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className="font-mono text-xs font-normal">
+                    <Badge
+                      variant="secondary"
+                      className="font-mono text-xs font-normal"
+                    >
                       {booking.travelDate || "Flexible"}
                     </Badge>
                   </TableCell>
@@ -166,13 +176,14 @@ export function BookingDataTable({
                   </TableCell>
                   <TableCell className="text-center">
                     <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
+                      className={cn(
+                        "uppercase font-mono",
                         booking.status === "confirmed"
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          ? "text-success"
                           : booking.status === "cancelled"
-                            ? "bg-destructive/10 text-destructive"
-                            : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                      }`}
+                            ? "text-destructive"
+                            : "text-warning",
+                      )}
                     >
                       {booking.status || "pending"}
                     </span>
@@ -180,19 +191,20 @@ export function BookingDataTable({
                   <TableCell className="text-right font-mono text-xs text-muted-foreground">
                     {formatBookingDateTime(booking.createdAt)}
                   </TableCell>
+                  <TableCell className="text-right font-mono text-xs text-muted-foreground">
+                    <BookingTableActions data={booking} />
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={8}
-                  className="h-44 text-center"
-                >
+                <TableCell colSpan={9} className="h-44 text-center">
                   <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <Inbox className="size-8 stroke-[1.5]" />
                     <p className="text-sm font-medium">No bookings found</p>
                     <p className="text-xs">
-                      Try adjusting your search filters or clear existing filters.
+                      Try adjusting your search filters or clear existing
+                      filters.
                     </p>
                   </div>
                 </TableCell>
@@ -201,7 +213,7 @@ export function BookingDataTable({
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={4}>
+              <TableCell colSpan={5}>
                 <div className="text-xs text-muted-foreground">
                   Showing{" "}
                   <span className="font-medium text-foreground">
@@ -231,7 +243,11 @@ export function BookingDataTable({
                       </SelectTrigger>
                       <SelectContent>
                         {PAGE_SIZE_OPTIONS.map((item) => (
-                          <SelectItem value={item.value} key={item.value} className="text-xs">
+                          <SelectItem
+                            value={item.value}
+                            key={item.value}
+                            className="text-xs"
+                          >
                             {item.label}
                           </SelectItem>
                         ))}
