@@ -15,10 +15,10 @@ export default defineConfig({
     varlockVitePlugin({ ssrInjectMode: "resolved-env" }),
     tailwindcss(),
     tanstackStart(),
-    nitro({ noExternals: true }),
+    nitro(),
     viteReact(),
   ],
   ssr: {
-    noExternal: ["@convex-dev/better-auth", "nepali-date-converter"],
+    noExternal: true,
   },
 });
