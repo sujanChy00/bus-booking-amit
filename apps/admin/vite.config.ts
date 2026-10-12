@@ -16,10 +16,15 @@ export default defineConfig({
     varlockVitePlugin({ ssrInjectMode: "resolved-env" }),
     tailwindcss(),
     tanstackStart(),
-    nitro(),
+    nitro({ noExternals: true }),
     viteReact(),
   ],
   ssr: {
-    noExternal: ["@convex-dev/better-auth", "nepali-date-converter", "react", "react-dom"],
+    noExternal: [
+      "@convex-dev/better-auth",
+      "nepali-date-converter",
+      "react",
+      "react-dom",
+    ],
   },
 });
