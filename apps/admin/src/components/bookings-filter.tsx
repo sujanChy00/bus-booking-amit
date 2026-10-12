@@ -9,7 +9,7 @@ import {
   convertToBsDateStructure,
   formattedDate,
 } from "@bus-booking/ui/lib/utils";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { ClientOnly, useNavigate, useSearch } from "@tanstack/react-router";
 import { NepaliDatePicker, type BSDate } from "bikram-sambat-react";
 import "bikram-sambat-react/styles.css";
 import { Phone, Search, User, X } from "lucide-react";
@@ -103,41 +103,43 @@ export const BookingsFilter = () => {
           placeholder="Filter by name..."
         />
       </InputGroup>
-      <NepaliDatePicker
-        components={{
-          ClearIcon: () => (
-            <button
-              type="button"
-              onClick={() => {
-                navigate({
-                  to: "/",
-                  search: (prev) => ({
-                    ...prev,
-                    travelDate: undefined,
-                  }),
-                });
-              }}
-            >
-              <X />
-            </button>
-          ),
-        }}
-        value={date}
-        onChange={setDate}
-        id="travel_date"
-        clearable
-        iconPosition="start"
-        className="w-full"
-        classNames={{
-          root: "w-full h-10!",
-          field:
-            "h-10! min-h-0! w-full border border-input! bg-background! shadow-xs! rounded-xl! focus-within:border-primary! focus-within:shadow-none! focus-within:shadow-none! focus-within:ring-1! focus-within:border-ring! transition-[color,box-shadow] focus-within:ring-ring/50! py-2! dark:bg-input/70!",
-          input: "h-10 w-full placeholder:text-muted-foreground!",
-          trigger: "rounded-2xl! h-10!",
-          icon: "text-muted-foreground! rounded-full",
-          clear: "rounded-full!",
-        }}
-      />
+      <ClientOnly fallback={<div className="h-13 w-full rounded-xl border" />}>
+        <NepaliDatePicker
+          components={{
+            ClearIcon: () => (
+              <button
+                type="button"
+                onClick={() => {
+                  navigate({
+                    to: "/",
+                    search: (prev) => ({
+                      ...prev,
+                      travelDate: undefined,
+                    }),
+                  });
+                }}
+              >
+                <X />
+              </button>
+            ),
+          }}
+          value={date}
+          onChange={setDate}
+          id="travel_date"
+          clearable
+          iconPosition="start"
+          className="w-full"
+          classNames={{
+            root: "w-full h-10!",
+            field:
+              "h-10! min-h-0! w-full border border-input! bg-background! shadow-xs! rounded-xl! focus-within:border-primary! focus-within:shadow-none! focus-within:shadow-none! focus-within:ring-1! focus-within:border-ring! transition-[color,box-shadow] focus-within:ring-ring/50! py-2! dark:bg-input/70!",
+            input: "h-10 w-full placeholder:text-muted-foreground!",
+            trigger: "rounded-2xl! h-10!",
+            icon: "text-muted-foreground! rounded-full",
+            clear: "rounded-full!",
+          }}
+        />
+      </ClientOnly>
       <Button onClick={onFilter} size={"xl"} className={"px-7"}>
         <Search />
         <span>Apply</span>

@@ -13,6 +13,7 @@ import {
   InputGroupInput,
 } from "@bus-booking/ui/components/input-group";
 import { adToBs, formattedDate } from "@bus-booking/ui/lib/utils";
+import { ClientOnly } from "@tanstack/react-router";
 import type { BSDate } from "bikram-sambat-react";
 import { NepaliDatePicker } from "bikram-sambat-react";
 import "bikram-sambat-react/styles.css";
@@ -150,24 +151,28 @@ export function BookingForm() {
             </Field>
             <Field>
               <FieldLabel htmlFor="travel_date">Travel date</FieldLabel>
-              <NepaliDatePicker
-                value={date}
-                onChange={setDate}
-                id="travel_date"
-                required
-                minDate={todayBs}
-                clearable
-                iconPosition="start"
-                className="w-full"
-                classNames={{
-                  root: "w-full h-13!",
-                  field:
-                    "h-13! min-h-0! w-full border border-input! bg-background! shadow-xs! rounded-xl! focus-within:border-primary! focus-within:shadow-none! focus-within:shadow-none! focus-within:ring-1! focus-within:border-ring! transition-[color,box-shadow] focus-within:ring-ring/50! py-2! dark:bg-input/70!",
-                  input: "h-13 w-full placeholder:text-muted-foreground!",
-                  trigger: "rounded-2xl! h-10!",
-                  icon: "text-muted-foreground!",
-                }}
-              />
+              <ClientOnly
+                fallback={<div className="h-13 w-full rounded-xl border" />}
+              >
+                <NepaliDatePicker
+                  value={date}
+                  onChange={setDate}
+                  id="travel_date"
+                  required
+                  minDate={todayBs}
+                  clearable
+                  iconPosition="start"
+                  className="w-full"
+                  classNames={{
+                    root: "w-full h-13!",
+                    field:
+                      "h-13! min-h-0! w-full border border-input! bg-background! shadow-xs! rounded-xl! focus-within:border-primary! focus-within:shadow-none! focus-within:shadow-none! focus-within:ring-1! focus-within:border-ring! transition-[color,box-shadow] focus-within:ring-ring/50! py-2! dark:bg-input/70!",
+                    input: "h-13 w-full placeholder:text-muted-foreground!",
+                    trigger: "rounded-2xl! h-10!",
+                    icon: "text-muted-foreground!",
+                  }}
+                />
+              </ClientOnly>
             </Field>
 
             <Field>
