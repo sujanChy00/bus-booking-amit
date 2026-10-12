@@ -1,5 +1,8 @@
 import { api } from "@bus-booking/backend/convex/_generated/api";
-import type { BookingResponse } from "@bus-booking/backend/convex/bookings";
+import type {
+  BookingResponse,
+  BookingStatus,
+} from "@bus-booking/backend/convex/bookings";
 import { Button } from "@bus-booking/ui/components/button";
 import {
   DropdownMenu,
@@ -18,13 +21,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export const BookingTableActions = ({ data }: { data: BookingResponse }) => {
-  const [status, setStatus] = useState(data.status ?? "pending");
+  const [status, setStatus] = useState<BookingStatus>(data.status ?? "pending");
   const [isPending, setIsPending] = useState(false);
 
   const updateStatus = useMutation(api.bookings.updateStatus);
   const removeBooking = useMutation(api.bookings.remove);
 
-  const onStatusChange = async (newStatus: string) => {
+  const onStatusChange = async (newStatus: BookingStatus) => {
     if (newStatus === status || isPending) return;
 
     const previousStatus = status;

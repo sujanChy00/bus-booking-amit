@@ -1,6 +1,12 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+export const bookingStatus = v.union(
+  v.literal("pending"),
+  v.literal("confirmed"),
+  v.literal("cancelled"),
+);
+
 export default defineSchema({
   bookings: defineTable({
     name: v.string(),
@@ -10,8 +16,7 @@ export default defineSchema({
     passengers: v.number(),
     from: v.string(),
     to: v.string(),
-    status: v.string(),
+    status: bookingStatus,
     createdAt: v.number(),
   }).index("by_createdAt", ["createdAt"]),
 });
-

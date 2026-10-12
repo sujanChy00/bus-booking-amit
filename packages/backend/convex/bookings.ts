@@ -1,7 +1,8 @@
-import { v } from "convex/values";
+import { Infer, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { requireAdmin } from "./adminAuth";
+import { bookingStatus } from "./schema";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
@@ -183,7 +184,7 @@ export const list = query({
 export const updateStatus = mutation({
   args: {
     id: v.id("bookings"),
-    status: v.string(),
+    status: bookingStatus,
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
@@ -207,3 +208,4 @@ export const remove = mutation({
 
 export type BookingResponse = Doc<"bookings">;
 export type BookingId = Id<"bookings">;
+export type BookingStatus = Infer<typeof bookingStatus>;
